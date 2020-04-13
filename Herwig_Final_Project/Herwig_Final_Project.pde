@@ -1,6 +1,8 @@
 import KinectPV2.KJoint;
 import KinectPV2.*;
 import java.util.ArrayList;
+import codeanticode.syphon.*;
+SyphonServer server;
 int vert1, vert2;
 Limbtracker limbtracker;
 Limbtracker limbtracker2;
@@ -21,6 +23,8 @@ void setup() {
     size(1920, 1080, P3D);
     colorMode(RGB);
     kinect = new KinectPV2(this);
+    server = new SyphonServer(this, "Processing Syphon");
+
   
     //kinect.enableSkeletonColorMap(true);
     //kinect.enableColorImg(true);
@@ -84,6 +88,8 @@ void draw() {
   SkullyBoi();
   popStyle();
   popMatrix();
+  
+  server.sendScreen();
 
     //fill(0, 0, 0);
     //text(frameRate, 50, 50);
