@@ -22,6 +22,11 @@ final int N = 128;
 final int iter = 16;
 final int SCALE = 4;
 float t = 0;
+//ParticleSystem ps;
+Smoke.ParticleSystem ps = Smoke.new ParticleSystem();
+//Cell[][] grid;
+//Cell[][] prev;
+ReactionDiffusion react;
 
 Fluid fluid;
 
@@ -36,7 +41,9 @@ void setup() {
     kinect = new KinectPV2(this);
     server = new SyphonServer(this, "Processing Syphon");
 
-  
+    PImage img = loadImage("texture.png"); 
+    ps = new ParticleSystem(0, new PVector(width/2, height-60), img);
+    
     //kinect.enableSkeletonColorMap(true);
     //kinect.enableColorImg(true);
     kinect.enableSkeleton3DMap(true);
@@ -57,6 +64,33 @@ void setup() {
     limbtracker3= new Limbtracker(25);
     
     gradient=new Gradients();
+    
+    //Reaction Diffusion
+    //react.grid = new react.Cell[width][height];
+    //react.prev = new react.Cell[width][height];
+
+    //  for (int i = 0; i < width; i++) {
+    //    for (int j = 0; j < height; j ++) {
+    //      float a = 1;
+    //      float b = 0;
+    //      grid[i][j] = new Cell(a, b);
+    //      prev[i][j] = new Cell(a, b);
+    //    }
+    //  }
+    
+    //  for (int n = 0; n < 1; n++) {
+    //    int startx = int(random(20, width-20));
+    //    int starty = int(random(20, height-20));
+    
+    //    for (int i = startx; i < startx+10; i++) {
+    //      for (int j = starty; j < starty+10; j ++) {
+    //        float a = 1;
+    //        float b = 1;
+    //        grid[i][j] = new Cell(a, b);
+    //        prev[i][j] = new Cell(a, b);
+    //      }
+    //    }
+    //  }
      
 }
 
@@ -100,25 +134,59 @@ void draw() {
   popStyle();
   popMatrix();
   
+  //Reaction Diffusion
+  //for (int i = 0; i < 1; i++) 
+  //{
+  //  update();
+  //  swap();
+  //}
+
+  //loadPixels();
+  //for (int i = 1; i < width-1; i++) {
+  //  for (int j = 1; j < height-1; j ++) {
+  //    Cell spot = grid[i][j];
+  //    float a = spot.a;
+  //    float b = spot.b;
+  //    int pos = i + j * width;
+     
+  //    pixels[pos] = color((a-b)*255);
+      
+  //  }
+  //}
+  //updatePixels();
   
-  int cx = int(0.5*width/SCALE);
-  int cy = int(0.5*height/SCALE);
-  for (int i = -1; i <= 1; i++) {
-    for (int j = -1; j <= 1; j++) {
-      fluid.addDensity(cx+i, cy+j, random(50, 150));
-    }
-  }
+//SMOKE  
+  // Calculate a "wind" force based on mouse horizontal position
+  float dx = map(mouseX, 0, width, -0.2, 0.2);
+  PVector wind = new PVector(dx, 0);
+  ps.applyForce(wind);
+  ps.run();
   for (int i = 0; i < 2; i++) {
-    float angle = noise(t) * TWO_PI * 2;
-    PVector v = PVector.fromAngle(angle);
-    v.mult(0.2);
-    t += 0.01;
-    fluid.addVelocity(cx, cy, v.x, v.y );
+    ps.addParticle();
   }
 
+  //FLUID
+  // Draw an arrow representing the wind force
+  //drawVector(wind, new PVector(width/2, 50, 0), 500);
+  
+  //int cx = int(0.5*width/SCALE);
+  //int cy = int(0.5*height/SCALE);
+  //for (int i = -1; i <= 1; i++) {
+  //  for (int j = -1; j <= 1; j++) {
+  //    fluid.addDensity(cx+i, cy+j, random(50, 150));
+  //  }
+  //}
+  //for (int i = 0; i < 2; i++) {
+  //  float angle = noise(t) * TWO_PI * 2;
+  //  PVector v = PVector.fromAngle(angle);
+  //  v.mult(0.2);
+  //  t += 0.01;
+  //  fluid.addVelocity(cx, cy, v.x, v.y );
+  //}
 
-  fluid.step();
-  fluid.renderD();
+
+  //fluid.step();
+  //fluid.renderD();
   //fluid.renderV();
   //fluid.fadeD();
   
