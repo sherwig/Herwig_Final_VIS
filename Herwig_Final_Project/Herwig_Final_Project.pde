@@ -23,26 +23,38 @@ final int iter = 16;
 final int SCALE = 4;
 float t = 0;
 //ParticleSystem ps;
-Smoke.ParticleSystem ps = Smoke.new ParticleSystem();
-//Cell[][] grid;
-//Cell[][] prev;
-ReactionDiffusion react;
+Smoke smoke = new Smoke();
+Smoke.ParticleSystem ps;
+float dA = 1.0;
+float dB = 0.3;
+float feed = 0.052;
+float k = 0.065;
+Cell[][] grid;
+Cell[][] prev;
+
+//ReactionDiffusion react = new ReactionDiffusion();
+//ReactionDiffusion.Cell cell;
 
 Fluid fluid;
 
-void settings() {
-  size(N*SCALE, N*SCALE);
-}
+//void settings() {
+// // size(N*SCALE, N*SCALE);
+//}
 
 void setup() {
-    //size(1920, 1080, P3D);
+    size(1920, 1080, P3D);
     fluid = new Fluid(0.2, 0, 0.0000001);
     colorMode(RGB);
-    kinect = new KinectPV2(this);
+    
+    //kinect = new KinectPV2(this);
+    
     server = new SyphonServer(this, "Processing Syphon");
 
-    PImage img = loadImage("texture.png"); 
-    ps = new ParticleSystem(0, new PVector(width/2, height-60), img);
+    PImage img = loadImage("Texture.png"); 
+    ps = smoke.new ParticleSystem(0, new PVector(width/2, height-60), img);
+
+    
+   // ps = new ParticleSystem(0, new PVector(width/2, height-60), img);
     
     //kinect.enableSkeletonColorMap(true);
     //kinect.enableColorImg(true);
@@ -66,31 +78,31 @@ void setup() {
     gradient=new Gradients();
     
     //Reaction Diffusion
-    //react.grid = new react.Cell[width][height];
-    //react.prev = new react.Cell[width][height];
+    grid = new Cell[width][height];
+    prev = new Cell[width][height];
 
-    //  for (int i = 0; i < width; i++) {
-    //    for (int j = 0; j < height; j ++) {
-    //      float a = 1;
-    //      float b = 0;
-    //      grid[i][j] = new Cell(a, b);
-    //      prev[i][j] = new Cell(a, b);
-    //    }
-    //  }
+      for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j ++) {
+          float a = 1;
+          float b = 0;
+          grid[i][j] = new Cell(a, b);
+          prev[i][j] = new Cell(a, b);
+        }
+      }
     
-    //  for (int n = 0; n < 1; n++) {
-    //    int startx = int(random(20, width-20));
-    //    int starty = int(random(20, height-20));
+      for (int n = 0; n < 1; n++) {
+        int startx = int(random(20, width-20));
+        int starty = int(random(20, height-20));
     
-    //    for (int i = startx; i < startx+10; i++) {
-    //      for (int j = starty; j < starty+10; j ++) {
-    //        float a = 1;
-    //        float b = 1;
-    //        grid[i][j] = new Cell(a, b);
-    //        prev[i][j] = new Cell(a, b);
-    //      }
-    //    }
-    //  }
+        for (int i = startx; i < startx+10; i++) {
+          for (int j = starty; j < starty+10; j ++) {
+            float a = 1;
+            float b = 1;
+            grid[i][j] = new Cell(a, b);
+            prev[i][j] = new Cell(a, b);
+          }
+        }
+      }
      
 }
 
@@ -135,35 +147,35 @@ void draw() {
   popMatrix();
   
   //Reaction Diffusion
-  //for (int i = 0; i < 1; i++) 
-  //{
-  //  update();
-  //  swap();
-  //}
+  for (int i = 0; i < 1; i++) 
+  {
+    update();
+    swap();
+  }
 
-  //loadPixels();
-  //for (int i = 1; i < width-1; i++) {
-  //  for (int j = 1; j < height-1; j ++) {
-  //    Cell spot = grid[i][j];
-  //    float a = spot.a;
-  //    float b = spot.b;
-  //    int pos = i + j * width;
+  loadPixels();
+  for (int i = 1; i < width-1; i++) {
+    for (int j = 1; j < height-1; j ++) {
+      Cell spot = grid[i][j];
+      float a = spot.a;
+      float b = spot.b;
+      int pos = i + j * width;
      
-  //    pixels[pos] = color((a-b)*255);
+      pixels[pos] = color((a-b)*255);
       
-  //  }
-  //}
-  //updatePixels();
+    }
+  }
+  updatePixels();
   
 //SMOKE  
   // Calculate a "wind" force based on mouse horizontal position
-  float dx = map(mouseX, 0, width, -0.2, 0.2);
-  PVector wind = new PVector(dx, 0);
-  ps.applyForce(wind);
-  ps.run();
-  for (int i = 0; i < 2; i++) {
-    ps.addParticle();
-  }
+  //float dx = map(mouseX, 0, width, -0.2, 0.2);
+  //PVector wind = new PVector(dx, 0);
+  //ps.applyForce(wind);
+  //ps.run();
+  //for (int i = 0; i < 2; i++) {
+  //  ps.addParticle();
+  //}
 
   //FLUID
   // Draw an arrow representing the wind force
@@ -413,6 +425,88 @@ void drawBody(KJoint[] joints) {
 
   drawJoint(joints, KinectPV2.JointType_Head);
 }
+
+  
+  class Cell {
+    float a;
+    float b;
+  
+    Cell(float a_, float b_) {
+      a = a_;
+      b = b_;
+    }
+  }
+    
+  void update() {
+    for (int i = 1; i < width-1; i++) {
+      for (int j = 1; j < height-1; j ++) {
+  
+        Cell spot = prev[i][j];
+        Cell newspot = grid[i][j];
+  
+        float a = spot.a;
+        float b = spot.b;
+  
+        float laplaceA = 0;
+        laplaceA += a*-1;
+        laplaceA += prev[i+1][j].a*0.2;
+        laplaceA += prev[i-1][j].a*0.2;
+        laplaceA += prev[i][j+1].a*0.2;
+        laplaceA += prev[i][j-1].a*0.2;
+        laplaceA += prev[i-1][j-1].a*0.05;
+        laplaceA += prev[i+1][j-1].a*0.05;
+        laplaceA += prev[i-1][j+1].a*0.05;
+        laplaceA += prev[i+1][j+1].a*0.05;
+  
+        float laplaceB = 0;
+        laplaceB += b*-1;
+        laplaceB += prev[i+1][j].b*0.2;
+        laplaceB += prev[i-1][j].b*0.2;
+        laplaceB += prev[i][j+1].b*0.2;
+        laplaceB += prev[i][j-1].b*0.2;
+        laplaceB += prev[i-1][j-1].b*0.05;
+        laplaceB += prev[i+1][j-1].b*0.05;
+        laplaceB += prev[i-1][j+1].b*0.05;
+        laplaceB += prev[i+1][j+1].b*0.05;
+  
+        newspot.a = a + (dA*laplaceA - a*b*b + feed*(1-a))*1;
+        newspot.b = b + (dB*laplaceB + a*b*b - (k+feed)*b)*1;
+  
+        newspot.a = constrain(newspot.a, 0, 1);
+        newspot.b = constrain(newspot.b, 0, 1);
+      }
+    }
+  }
+  
+  void swap() 
+  {
+    Cell[][] temp = prev;
+    prev = grid;
+    grid = temp;
+  }
+  
+  
+  //float hue=0;
+  //float hue2=0;
+
+       // color c = color(1/(a*255), 1/(b*255), (a-b)*255);
+        //hue=hue+.1;
+        //hue2=hue2+.3;
+        //color c = color(hue, hue, (a-b)*255);
+        
+        //if(hue>255)
+        //{
+        //  hue=0;
+        //}
+        //if(hue2>255)
+        //{
+        //  hue2=0;
+        //}
+        
+       // pixels[pos] = c;
+        //println(1-(a*255));
+
+  
 
 //draw joint
 //void drawJoint(KJoint[] joints, int jointType) {
