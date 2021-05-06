@@ -220,13 +220,8 @@ void SkullyBoi()
       KJoint[] joints = skeleton.getJoints();
       float xSetter=getJointX(joints,KinectPV2.JointType_SpineMid);
        // println(xSetter);    
-       col3=color(255,127,80,100);
-       col1=color(255,251,157,100);
        //println(zoneSetter);       
-                 
-        //Checking what third the skeloten is in
-        if(xSetter>.24 && zoneSetter[2]==false)
-        {                            
+                          
              zoneSetter[2]=true;    
               
              //drawTriangleBoi(joints);
@@ -257,100 +252,18 @@ void SkullyBoi()
                               
               }
               
-              if (limbtracker.limbActivated(KinectPV2.JointType_FootRight)) 
+              if (limbtracker.limbActivated(KinectPV2.JointType_KneeRight)) 
               {      
 
               }
                     
-              if (limbtracker.limbActivated(KinectPV2.JointType_FootLeft)) 
-              {            
-               }            
-         }
-       
-       else if(xSetter<.24 && xSetter>-.52 && zoneSetter[1]==false)
-        {          
-             zoneSetter[1]=true;       
-             limbtracker2.update2(joints);
-             limbtracker2.fillFollowing(KinectPV2.JointType_Count);
-             //drawSquiglyBoi(joints);
-             float[] comparison2=limbtracker2.distance(KinectPV2.JointType_Count);
-             limbtracker2.fillBuffer(comparison2);
-             
-              if (limbtracker2.limbActivated(KinectPV2.JointType_HandLeft)) 
-              {              
-                               
-              }
-                           
-              if(limbtracker2.limbFlailing(KinectPV2.JointType_HandLeft))
-              {
-            
-              } 
-              
-              else
-              {
-
-               
-              }
-                
-             if (limbtracker2.limbActivated(KinectPV2.JointType_HandRight)) 
-              {            
+              if (limbtracker.limbActivated(KinectPV2.JointType_KneeLeft)) 
+              {  
                 
               }
               
-              if (limbtracker2.limbActivated(KinectPV2.JointType_FootRight)) 
-              {                          
-              }
-                    
-              if (limbtracker2.limbActivated(KinectPV2.JointType_FootLeft)) 
-              {            
-              }                                       
-        }
-        
-        else if(xSetter<-.52 && zoneSetter[0]==false)
-        {       
-             //println(4);                  
-             zoneSetter[0]=true;
-                   
-             //drawSquareBoi(joints);
-             limbtracker3.update2(joints);                    
-             float[] comparison3=limbtracker3.distance(KinectPV2.JointType_Count);
-             limbtracker3.fillBuffer(comparison3);          
-             
-              if (limbtracker3.limbActivated(KinectPV2.JointType_HandLeft)) 
-              {              
-              
-              }
-              
-              if(limbtracker3.limbFlailing(KinectPV2.JointType_HandLeft))
-              {
-          
-              }      
-              
-              else 
-              {
-            
-              }
-                
-              if (limbtracker3.limbActivated(KinectPV2.JointType_HandRight)) 
-              {            
-                        
-              }
-              
-              if (limbtracker3.limbActivated(KinectPV2.JointType_FootRight)) 
-              {            
-           
-              }
-                    
-              if (limbtracker3.limbActivated(KinectPV2.JointType_FootLeft)) 
-              {            
-               
-              }                                               
-          }
-        }      
-       //drawBody(joints);  
-       //text(skeletonArray.size(), 100,100);
-       //text(spot,150,150);
-    }       
+      }
+  }
   
 }
 
